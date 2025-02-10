@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento - Funcionalidades Premium</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <div class="max-w-md mx-auto mt-10 text-center">
+    <h1 class="text-2xl font-bold mb-4">Pagamento via PIX</h1>
+    <p class="mb-4">Adquira funcionalidades premium para customização e estatísticas avançadas.</p>
+    <button id="payButton" class="bg-green-500 text-white p-2 rounded">Pagar Agora</button>
+    <div id="paymentStatus" class="mt-4"></div>
+  </div>
+  <script>
+    document.getElementById('payButton').addEventListener('click', async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('https://api.greb.com.br/functions/code_50c7d2/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({
+          action: 'create_payment',
+          product_name: 'Funcionalidades Premium',
+          product_description: 'Acesso a personalizações, skins e estatísticas avançadas',
+          product_price: 500,  
+          return_url: window.location.href,
+          completion_url: window.location.href
+        })
+      });
+      const data = await response.json();
+      if(data.success) {
+        // Redireciona para o checkout
+        window.location.href = data.payment.url;
+      } else {
+        document.getElementById('paymentStatus').innerText = data.message;
+      }
+    });
+  </script>
+</body>
+</html>
